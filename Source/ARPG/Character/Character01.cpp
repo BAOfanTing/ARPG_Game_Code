@@ -46,7 +46,8 @@ void ACharacter01::BeginPlay()
 }
 
 void ACharacter01::MoveForward(float Value)
-{
+{	//判断攻击时不能移动
+	if (ActionState == EActionState::EAS_Attacking) return;
 	if (Controller && Value!=0) 
 	{	//找到哪个向量是向前的
 		// 获取控制器的旋转方向,创建一个只包含Yaw旋转的FRotator对象
@@ -59,7 +60,8 @@ void ACharacter01::MoveForward(float Value)
 }
 
 void ACharacter01::MoveRight(float Value)
-{
+{	//判断攻击时不能移动
+	if (ActionState == EActionState::EAS_Attacking) return;
 	if (Controller && Value != 0)
 	{	//找到哪个向量是向前的
 		// 获取控制器的旋转方向,创建一个只包含Yaw旋转的FRotator对象
@@ -69,7 +71,6 @@ void ACharacter01::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 	}
-	
 }
 
 void ACharacter01::Turn(float Value)
@@ -134,6 +135,7 @@ void ACharacter01::AttackEnd()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
+//判断上一次是否播放完以及人物是否有武器
 bool ACharacter01::CanAttack()
 {
 	return ActionState == EActionState::EAS_Unoccupied && 

@@ -41,7 +41,7 @@ void Aitem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	if (Character01)
 	{
 		Character01->SetOverlappingItem(this);
-		if ((Character01->GetCharacterState()) == UnequipedState)
+		if (ItemState == EItemState::EIS_UnOnHand)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Press E to Pick Up!"));
 		}
@@ -64,10 +64,9 @@ void Aitem::Tick(float DeltaTime)
 
 	// 记录经过的总时间
 	RunningTime += DeltaTime;
-
-	//// 计算振幅（Amplitude）经过正弦函数计算后的值，用于使 Actor 在 Z 轴上上下移动
-	//float DeltaZ = Amplitude * FMath::Sin(RunningTime * 5.f);
-
-	//// 将 Actor 在世界空间中的位置偏移 (0, 0, DeltaZ)
-	//AddActorWorldOffset(FVector(0.f, 0.f, DeltaZ));
+	//当物体不被拿起时漂浮
+	if (ItemState == EItemState::EIS_UnOnHand)
+	{
+		AddActorWorldOffset(FVector(0.f,0.f,TransformedSin()));
+	}
 }

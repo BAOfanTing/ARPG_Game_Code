@@ -8,6 +8,14 @@
 #include "ARPG/Character/CharacterType.h"
 #include "item.generated.h"
 
+UENUM(BlueprintType)
+enum class EItemState : uint8
+{
+	EIS_UnOnHand UMETA(DisplayName="UnOnHand"),
+	EIS_OnHand UMETA(DisplayName = "OnHand")
+};
+
+
 UCLASS()
 class ARPG_API Aitem : public AActor
 {
@@ -23,8 +31,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Amplitude = 2.f;
 
-	UPROPERTY(VisibleAnywhere)
-	ECharacterState UnequipedState = ECharacterState::ECS_Unequiped;
+	//一开始未被拿起
+	UPROPERTY(BlueprintReadWrite)
+	EItemState ItemState = EItemState::EIS_UnOnHand;
 
 protected:
 	virtual void BeginPlay() override;

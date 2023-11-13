@@ -45,7 +45,7 @@ protected:
 	void PlayAttackMontage();
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
-	void CanAttack();
+	bool CanAttack();
 
 public:
 
