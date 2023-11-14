@@ -3,11 +3,26 @@
 
 #include "Weapon.h"
 #include "ARPG/Character/Character01.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
 
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
-{	//附加组件到socket
+{
+	// 调用 AttachMeshToSocket 函数将武器的 Mesh 附加到指定的骨骼插槽上
 	AttachMeshToSocket(InParent, InSocketName);
+
+	// 设置武器的状态为在手上
 	ItemState = EItemState::EIS_OnHand;
+
+	// 如果设置了装备音效，就在武器的位置播放音效
+	if (EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, EquipSound, GetActorLocation());
+	}
+	if (Sphere)
+	{
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)

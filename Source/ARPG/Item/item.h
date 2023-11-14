@@ -35,6 +35,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	EItemState ItemState = EItemState::EIS_UnOnHand;
 
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* Sphere;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -51,8 +54,7 @@ private:
 	UPROPERTY(VisibleAnywhere,BlueprintReadonly,meta = (AllowPrivateAccess = "true"))
 	float RunningTime = 0.f;
 
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* Sphere;
+	
 
 
 };
