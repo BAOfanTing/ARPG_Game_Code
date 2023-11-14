@@ -10,6 +10,7 @@
  * 
  */
  class USoundBase;
+ class UBoxComponent;
 
 UCLASS()
 class ARPG_API AWeapon : public Aitem
@@ -17,6 +18,7 @@ class ARPG_API AWeapon : public Aitem
 	GENERATED_BODY()
 
 public:
+	AWeapon();
 	// 装备武器的函数，将武器附加到指定的骨骼插槽上
 	void Equip(USceneComponent* InParent, FName InSocketName);
 
@@ -32,5 +34,8 @@ public:
 	// 武器装备时播放的音效
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
 	USoundBase* EquipSound;
+	//添加方向碰撞
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UBoxComponent* WeaponBox;
 };
 
