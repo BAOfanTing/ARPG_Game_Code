@@ -47,7 +47,7 @@ void ACharacter01::BeginPlay()
 
 void ACharacter01::MoveForward(float Value)
 {	//判断攻击时不能移动
-	if (ActionState == EActionState::EAS_Attacking) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && Value!=0) 
 	{	//找到哪个向量是向前的
 		// 获取控制器的旋转方向,创建一个只包含Yaw旋转的FRotator对象
@@ -61,7 +61,7 @@ void ACharacter01::MoveForward(float Value)
 
 void ACharacter01::MoveRight(float Value)
 {	//判断攻击时不能移动
-	if (ActionState == EActionState::EAS_Attacking) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && Value != 0)
 	{	//找到哪个向量是向前的
 		// 获取控制器的旋转方向,创建一个只包含Yaw旋转的FRotator对象
@@ -88,9 +88,29 @@ void ACharacter01::EKeyPressed()
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Amplitude = 0.f;
 		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"));
 		CharacterState = ECharacterState::ECS_EquipedOneHandWeapon;
+		//是一种清理操作，确保在装备武器后，不再意外地使用或引用已经装备的物品
+		OverlappingItem = nullptr;
+		//人物拿起武器时，就有了武器变量，用于卸下和装备武器
+		EquippedWeapon = OverlappingWeapon;
+	}
+	else
+	{	//收起武器,并设置人物转态
+		if(CanDisarm())
+		{
+			PlayEquipMontage(FName("Unequip"));
+			CharacterState = ECharacterState::ECS_Unequipped;
+			ActionState = EActionState::EAS_Equipping;
+		}
+		//拿出武器
+		else if (Canarm())
+		{
+			PlayEquipMontage(FName("Equip"));
+			CharacterState = ECharacterState::ECS_EquipedOneHandWeapon;
+			ActionState = EActionState::EAS_Equipping;
+		}
+	
 	}
 }
 
@@ -139,7 +159,52 @@ void ACharacter01::AttackEnd()
 bool ACharacter01::CanAttack()
 {
 	return ActionState == EActionState::EAS_Unoccupied && 
-		CharacterState != ECharacterState::ECS_Unequiped;
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ACharacter01::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied && 
+	CharacterState != ECharacterState::ECS_Unequipped ;
+}
+
+bool ACharacter01::Canarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied && 
+	CharacterState == ECharacterState::ECS_Unequipped  && EquippedWeapon;
+}
+
+void ACharacter01::PlayEquipMontage(FName SectionName)
+{
+	// 获取角色的骨架并检查是否存在动画实例以及蒙太奇（Montage）
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{	// 在动画实例上播放蒙太奇
+		AnimInstance->Montage_Play(EquipMontage);
+		// 跳转到所选的攻击部分
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
+void ACharacter01::Disarm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(),FName("SpineSocket"));
+	}
+}
+
+void ACharacter01::Arm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
+}
+//动画完成播放，重置状态
+void ACharacter01::FinishPlayAnim()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 
@@ -153,7 +218,7 @@ void ACharacter01::Tick(float DeltaTime)
 void ACharacter01::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	// 绑定输入轴和动作到相应的函数
 	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ACharacter01::MoveForward);
 	PlayerInputComponent->BindAxis(FName("MoveRight"),this,&ACharacter01::MoveRight);
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &ACharacter01::Turn);

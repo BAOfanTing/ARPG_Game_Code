@@ -11,6 +11,8 @@
 #include "Character01.generated.h"
 
 class Aitem;
+class UAnimMontage;
+class AWeapon;
 
 UCLASS()
 class ARPG_API ACharacter01 : public ACharacter
@@ -45,7 +47,21 @@ protected:
 	void PlayAttackMontage();
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
+	//能够攻击
 	bool CanAttack();
+
+	//能够卸下武器
+	bool CanDisarm();
+	bool Canarm();
+	void PlayEquipMontage(FName SectionName);
+	UPROPERTY(VisibleAnywhere,Category = Weapon)
+	AWeapon* EquippedWeapon;
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+	UFUNCTION(BlueprintCallable)
+	void Arm();
+	UFUNCTION(BlueprintCallable)
+	void FinishPlayAnim();
 
 public:
 
@@ -60,7 +76,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Eyebrows;
 	//定义初始状态，未装备武器 
-	ECharacterState CharacterState = ECharacterState::ECS_Unequiped;
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
 	UPROPERTY(BlueprintReadWrite)
 	EActionState ActionState = EActionState::EAS_Unoccupied;
@@ -69,7 +85,10 @@ public:
 	//Animation montages
 	*/
 	UPROPERTY(EditDefaultsOnly,Category = Montages)
-	class UAnimMontage* AttackMontage;
+	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
 
 private:
 	UPROPERTY(VisibleInstanceOnly)

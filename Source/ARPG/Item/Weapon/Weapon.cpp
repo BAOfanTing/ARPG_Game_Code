@@ -5,12 +5,17 @@
 #include "ARPG/Character/Character01.h"
 
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
-{	
+{	//附加组件到socket
+	AttachMeshToSocket(InParent, InSocketName);
+	ItemState = EItemState::EIS_OnHand;
+}
+
+void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
+{
 	// 创建一个 FAttachmentTransformRules 对象，规定附着的规则。
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 	// 将武器的 ItemMesh 附着到InParent的 Mesh 上，并使用Socket作为附着点
 	ItemMesh->AttachToComponent(InParent, TransformRules, InSocketName);
-	ItemState = EItemState::EIS_OnHand;
 }
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
